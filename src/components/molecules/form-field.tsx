@@ -13,7 +13,7 @@ const FormField = ({ label, error, helperText, ...props }: FormFieldProps) => {
     <div className="space-y-1">
       <Input label={label} error={error} {...props} />
       {helperText && !error && (
-        <p className="text-sm text-gray-500 dark:text-gray-400">{helperText}</p>
+        <p className="text-sm text-muted-foreground">{helperText}</p>
       )}
     </div>
   );

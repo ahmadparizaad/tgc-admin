@@ -27,12 +27,12 @@ const Header = ({ admin, onMenuClick }: HeaderProps) => {
   };
 
   return (
-    <header className="h-16 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700 px-4 sm:px-6 flex items-center justify-between">
+    <header className="sticky top-0 z-30 h-16 bg-background/80 backdrop-blur-md border-b border-border px-4 sm:px-6 flex items-center justify-between transition-all duration-200">
       <div className="flex items-center gap-4">
         {/* Mobile menu button */}
         <button
           onClick={onMenuClick}
-          className="lg:hidden p-2 -ml-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+          className="lg:hidden p-2 -ml-2 rounded-3xl text-muted-foreground hover:bg-accent hover:text-accent-foreground"
           aria-label="Open menu"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -40,7 +40,7 @@ const Header = ({ admin, onMenuClick }: HeaderProps) => {
           </svg>
         </button>
         
-        <h1 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">
+        <h1 className="text-base sm:text-lg font-semibold text-foreground">
           Admin Panel
         </h1>
       </div>
@@ -51,9 +51,9 @@ const Header = ({ admin, onMenuClick }: HeaderProps) => {
             e.stopPropagation();
             setIsDropdownOpen(!isDropdownOpen);
           }}
-          className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100"
+          className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium text-sm">
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-medium text-sm shadow-sm">
             {admin?.email?.charAt(0).toUpperCase() || 'A'}
           </div>
           <span className="hidden sm:block max-w-[150px] truncate">{admin?.email || 'Admin'}</span>
@@ -63,14 +63,14 @@ const Header = ({ admin, onMenuClick }: HeaderProps) => {
         </button>
 
         {isDropdownOpen && (
-          <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-1 z-50">
-            <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
-              <p className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{admin?.email}</p>
-              <p className="text-xs text-gray-500 dark:text-gray-400 capitalize">{admin?.role}</p>
+          <div className="absolute right-0 mt-2 w-48 bg-popover rounded-3xl shadow-lg border border-border py-1 z-50 animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-4 py-2 border-b border-border">
+              <p className="text-sm font-medium text-popover-foreground truncate">{admin?.email}</p>
+              <p className="text-xs text-muted-foreground capitalize">{admin?.role}</p>
             </div>
             <Button
               variant="ghost"
-              className="w-full justify-start text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+              className="w-full justify-start text-destructive hover:bg-destructive/10 hover:text-destructive"
               onClick={handleLogout}
             >
               <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

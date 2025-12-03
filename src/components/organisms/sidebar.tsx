@@ -61,23 +61,27 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
       {/* Sidebar */}
       <aside
         className={`
-          fixed left-0 top-0 z-50 h-screen w-64 bg-white dark:bg-gray-900 
-          border-r border-gray-200 dark:border-gray-700
+          fixed left-0 top-0 z-50 h-screen w-64 bg-card border-r border-border
           transform transition-transform duration-300 ease-in-out
           lg:translate-x-0 lg:z-40
           ${isOpen ? 'translate-x-0' : '-translate-x-full'}
         `}
       >
         {/* Logo */}
-        <div className="flex h-16 items-center justify-between px-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center">
-            <span className="text-xl font-bold text-blue-600 dark:text-blue-400">VARLYQ</span>
-            <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">Admin</span>
+        <div className="flex h-16 items-center justify-between px-4 border-b border-border">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-3xl bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-lg shadow-primary/25">
+              V
+            </div>
+            <div>
+              <span className="text-xl font-bold text-foreground tracking-tight">VARLYQ</span>
+              <span className="ml-2 text-xs text-muted-foreground uppercase tracking-wider">Admin</span>
+            </div>
           </div>
           {/* Close button for mobile */}
           <button
             onClick={onClose}
-            className="lg:hidden p-2 rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="lg:hidden p-2 rounded-3xl text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             aria-label="Close sidebar"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -98,10 +102,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     href={item.href}
                     onClick={onClose}
                     className={`
-                      flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-colors
+                      flex items-center gap-3 px-4 py-2.5 rounded-3xl text-sm font-medium transition-all duration-200
                       ${isActive
-                        ? 'bg-blue-50 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300'
-                        : 'text-gray-700 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-800'
+                        ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20 translate-x-1'
+                        : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground hover:translate-x-1'
                       }
                     `}
                   >

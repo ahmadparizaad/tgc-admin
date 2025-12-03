@@ -120,8 +120,15 @@ export const apiClient = async <T>(
       };
     }
 
+    // Preserve pagination wrapper if provided by backend
+    // - If backend returns { data: <payload>, pagination: {...} }, keep that wrapper
+    // - If backend returns { data: <payload> } (no pagination), unwrap to payload for convenience
+    // - Otherwise, return full body as payload
+    const hasPagination = data && Object.prototype.hasOwnProperty.call(data, 'pagination');
+    const payload = hasPagination ? { data: data.data, pagination: data.pagination } : (data && Object.prototype.hasOwnProperty.call(data, 'data') ? data.data : data);
+
     return {
-      data: data.data || data,
+      data: payload,
       error: null,
       success: true,
     };
