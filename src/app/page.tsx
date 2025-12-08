@@ -244,11 +244,11 @@ export default function DashboardPage() {
 
             {/* Recent Payments */}
             <div className="bg-card rounded-3xl shadow-lg border border-border overflow-hidden animate-slide-up" style={{ animationDelay: '0.3s' }}>
-              <div className="px-4 sm:px-6 py-4 border-b border-border flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div className="px-4 sm:px-6 py-4 border-b border-border flex flex-row items-center justify-between gap-2">
                 <h2 className="text-base sm:text-lg font-semibold text-foreground">
                   Recent Payments
                 </h2>
-                <Link href="/users">
+                <Link href="/payments">
                   <Button variant="ghost" size="sm">View All</Button>
                 </Link>
               </div>
@@ -320,35 +320,6 @@ export default function DashboardPage() {
               )}
             </div>
 
-            {/* Revenue Chart */}
-            <div className="bg-card rounded-3xl shadow-lg border border-border p-4 sm:p-6 animate-slide-up" style={{ animationDelay: '0.4s' }}>
-              <h2 className="text-base sm:text-lg font-semibold text-foreground mb-4">
-                Revenue Overview
-              </h2>
-              <div className="h-64">
-                <ResponsiveContainer>
-                  <AreaChart data={chartData}>
-                    <defs>
-                      <linearGradient id="revenueGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                        <stop offset="0%" stopColor='#e7ebe5ff' stopOpacity={1}/>
-                        <stop offset="100%" stopColor='#9df881ff' stopOpacity={1} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="name" stroke="rgb(156 163 175)" />
-                    <YAxis stroke="rgb(156 163 175)" />
-                    <CartesianGrid strokeDasharray="3 3" className="text-muted-foreground" />
-                    <Tooltip contentStyle={{ backgroundColor: 'rgb(17 24 39)', borderColor: 'rgb(31 41 55)' }} />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#38ca3fff"
-                      strokeWidth={2}
-                      fill="url(#revenueGradient)"
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
           </>
         )}
       </div>
