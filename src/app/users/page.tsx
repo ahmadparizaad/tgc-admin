@@ -153,7 +153,7 @@ function UsersContent() {
               <thead className="bg-muted/50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    User
+                    ID / User
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     City
@@ -162,7 +162,7 @@ function UsersContent() {
                     Status
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
-                    Subscription
+                    Plan / Expiry
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                     Joined
@@ -177,6 +177,9 @@ function UsersContent() {
                   <tr key={user.id} className="hover:bg-muted/50 transition-colors">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
+                        <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded-md w-fit mb-1">
+                          #{user.displayId || 'N/A'}
+                        </span>
                         {user.fullName && (
                           <span className="text-sm font-medium text-foreground">
                             {user.fullName}
@@ -196,13 +199,22 @@ function UsersContent() {
                       </Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      {user.hasActiveSubscription ? (
-                        <Badge variant="info">
-                          {user.subscription.isUnlimited ? 'Unlimited' : `${user.subscription.plan} (Active)`}
-                        </Badge>
-                      ) : (
-                        <Badge variant="default">No Subscription</Badge>
-                      )}
+                      <div className="flex flex-col gap-1">
+                        {user.hasActiveSubscription ? (
+                          <>
+                            <Badge variant="info" className="w-fit">
+                              {user.subscription.planTier}
+                            </Badge>
+                            {user.subscription.endDate && (
+                              <span className="text-[10px] text-muted-foreground">
+                                Expires: {new Date(user.subscription.endDate).toLocaleDateString()}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          <Badge variant="default" className="w-fit">No Subscription</Badge>
+                        )}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">
                       {new Date(user.createdAt).toLocaleDateString()}

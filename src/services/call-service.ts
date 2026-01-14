@@ -1,14 +1,23 @@
 import { apiClient } from './api-client';
 import type { ClientResponse, PaginatedResponse } from '@/shared/types';
 
+export interface TargetPrice {
+  price: number;
+  label: string;
+  order: number;
+}
+
 export interface Call {
+  [x: string]: number;
   id: string;
   _id?: string;
-  commodity: 'gold' | 'silver' | 'nifty' | 'copper';
+  commodity: 'Gold' | 'Silver' | 'Copper' | 'Crude' | 'CMX Gold' | 'CMX Silver' | 'Custom';
+  customCommodity?: string;
   type: 'buy' | 'sell';
   entryPrice: number;
-  target: number;
+  targetPrices: TargetPrice[];
   stopLoss: number;
+  analysis: string;
   status: 'active' | 'hit_target' | 'hit_stoploss' | 'expired';
   date: string;
   createdBy?: {
@@ -21,10 +30,12 @@ export interface Call {
 
 export interface CreateCallData {
   commodity: string;
+  customCommodity?: string;
   type: string;
   entryPrice: number;
-  target: number;
+  targetPrices: TargetPrice[];
   stopLoss: number;
+  analysis: string;
   date: string;
   status?: string;
 }

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/templates';
 import { Button, Badge, Skeleton } from '@/components/atoms';
-import { getDashboardStats, getRecentPayments, getSubscriptionMetrics } from '@/services/dashboard-service';
+import { getDashboardStats, getRecentPayments, getSubscriptionMetrics, getRevenueTrend } from '@/services/dashboard-service';
 import type { DashboardStats, SubscriptionMetrics, Payment } from '@/services/dashboard-service';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -12,27 +12,18 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [subscriptionMetrics, setSubscriptionMetrics] = useState<SubscriptionMetrics | null>(null);
   const [recentPayments, setRecentPayments] = useState<Payment[]>([]);
+  const [chartData, setChartData] = useState<{ name: string; revenue: number }[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Mock data for chart
-  const chartData = [
-    { name: 'Jan', revenue: 4000 },
-    { name: 'Feb', revenue: 3000 },
-    { name: 'Mar', revenue: 2000 },
-    { name: 'Apr', revenue: 2780 },
-    { name: 'May', revenue: 1890 },
-    { name: 'Jun', revenue: 2390 },
-    { name: 'Jul', revenue: 3490 },
-  ];
 
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       
-      const [statsResponse, metricsResponse, paymentsResponse] = await Promise.all([
+      const [statsResponse, metricsResponse, paymentsResponse, trendResponse] = await Promise.all([
         getDashboardStats(),
         getSubscriptionMetrics(),
         getRecentPayments(5),
+        getRevenueTrend(),
       ]);
 
       if (statsResponse.success && statsResponse.data) {
@@ -45,6 +36,10 @@ export default function DashboardPage() {
 
       if (paymentsResponse.success && paymentsResponse.data) {
         setRecentPayments(paymentsResponse.data.payments);
+      }
+
+      if (trendResponse.success && trendResponse.data) {
+        setChartData(trendResponse.data.trend);
       }
 
       setIsLoading(false);

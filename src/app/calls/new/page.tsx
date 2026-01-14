@@ -9,10 +9,13 @@ import { createCall } from '@/services/call-service';
 import type { CreateCallData } from '@/services/call-service';
 
 const COMMODITY_OPTIONS = [
-  { value: 'gold', label: 'Gold' },
-  { value: 'silver', label: 'Silver' },
-  { value: 'nifty', label: 'Nifty' },
-  { value: 'copper', label: 'Copper' },
+  { value: 'Gold', label: 'Gold' },
+  { value: 'Silver', label: 'Silver' },
+  { value: 'Copper', label: 'Copper' },
+  { value: 'Crude', label: 'Crude' },
+  { value: 'CMX Gold', label: 'CMX Gold' },
+  { value: 'CMX Silver', label: 'CMX Silver' },
+  { value: 'Custom', label: 'Other/Manual' },
 ];
 
 const TYPE_OPTIONS = [
@@ -27,22 +30,51 @@ export default function NewCallPage() {
 
   // Form state
   const [formData, setFormData] = useState<CreateCallData>({
-    commodity: 'gold',
+    commodity: 'Gold',
+    customCommodity: '',
     type: 'buy',
     entryPrice: 0,
-    target: 0,
+    targetPrices: [{ price: 0, label: 'Target 1', order: 1 }],
     stopLoss: 0,
+    analysis: '',
     date: new Date().toISOString().split('T')[0],
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: ['entryPrice', 'target', 'stopLoss'].includes(name)
+      [name]: ['entryPrice', 'stopLoss'].includes(name)
         ? parseFloat(value) || 0
         : value,
     }));
+  };
+
+  const handleTargetChange = (index: number, field: string, value: string | number) => {
+    const newTargets = [...formData.targetPrices];
+    newTargets[index] = {
+      ...newTargets[index],
+      [field]: field === 'price' ? parseFloat(value.toString()) || 0 : value
+    };
+    setFormData({ ...formData, targetPrices: newTargets });
+  };
+
+  const addTarget = () => {
+    if (formData.targetPrices.length >= 6) return;
+    const nextOrder = formData.targetPrices.length + 1;
+    setFormData({
+      ...formData,
+      targetPrices: [
+        ...formData.targetPrices,
+        { price: 0, label: `Target ${nextOrder}`, order: nextOrder }
+      ]
+    });
+  };
+
+  const removeTarget = (index: number) => {
+    if (formData.targetPrices.length <= 1) return;
+    const newTargets = formData.targetPrices.filter((_, i) => i !== index);
+    setFormData({ ...formData, targetPrices: newTargets });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -50,38 +82,50 @@ export default function NewCallPage() {
     setError(null);
 
     // Validation
-    if (formData.entryPrice <= 0) {
-      setError('Entry price must be greater than 0');
+    if (formData.commodity === 'Custom' && !formData.customCommodity) {
+      setError('Please specify the custom commodity name');
       return;
     }
-    if (formData.target <= 0) {
-      setError('Target must be greater than 0');
+    if (formData.entryPrice <= 0) {
+      setError('Entry price must be greater than 0');
       return;
     }
     if (formData.stopLoss <= 0) {
       setError('Stop loss must be greater than 0');
       return;
     }
+    if (formData.targetPrices.some(t => t.price <= 0)) {
+      setError('All target prices must be greater than 0');
+      return;
+    }
+    if (!formData.analysis) {
+      setError('Analysis/Rationale is required');
+      return;
+    }
 
-    // Validate target and stoploss based on call type
-    if (formData.type === 'buy') {
-      if (formData.target <= formData.entryPrice) {
-        setError('For BUY calls, target must be greater than entry price');
-        return;
+    // Validate targets based on call type
+    for (const target of formData.targetPrices) {
+      if (formData.type === 'buy') {
+        if (target.price <= formData.entryPrice) {
+          setError(`Target "${target.label}" must be greater than entry price for BUY calls`);
+          return;
+        }
+      } else {
+        if (target.price >= formData.entryPrice) {
+          setError(`Target "${target.label}" must be less than entry price for SELL calls`);
+          return;
+        }
       }
-      if (formData.stopLoss >= formData.entryPrice) {
-        setError('For BUY calls, stop loss must be less than entry price');
-        return;
-      }
-    } else {
-      if (formData.target >= formData.entryPrice) {
-        setError('For SELL calls, target must be less than entry price');
-        return;
-      }
-      if (formData.stopLoss <= formData.entryPrice) {
-        setError('For SELL calls, stop loss must be greater than entry price');
-        return;
-      }
+    }
+
+    // Validate stoploss
+    if (formData.type === 'buy' && formData.stopLoss >= formData.entryPrice) {
+      setError('For BUY calls, stop loss must be less than entry price');
+      return;
+    }
+    if (formData.type === 'sell' && formData.stopLoss <= formData.entryPrice) {
+      setError('For SELL calls, stop loss must be greater than entry price');
+      return;
     }
 
     setIsSubmitting(true);
@@ -99,8 +143,8 @@ export default function NewCallPage() {
 
   return (
     <DashboardLayout>
-      <div className="max-w-2xl mx-auto space-y-4 sm:space-y-6">
-        {/* Page Header */}
+      <div className="max-w-3xl mx-auto space-y-4 sm:space-y-6 pb-10">
+        {/* Page Header omitted for brevity in replace tool, but included in my mind */}
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
           <Link href="/calls">
             <Button variant="ghost" size="sm">
@@ -113,7 +157,7 @@ export default function NewCallPage() {
           <div>
             <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100">New Call</h1>
             <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mt-1">
-              Create a new trading call
+              Create a new trading call with multiple targets
             </p>
           </div>
         </div>
@@ -129,10 +173,7 @@ export default function NewCallPage() {
 
             {/* Date */}
             <div>
-              <label
-                htmlFor="date"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
+              <label htmlFor="date" className="block text-sm font-medium text-foreground mb-2">
                 Date
               </label>
               <input
@@ -149,10 +190,7 @@ export default function NewCallPage() {
             {/* Commodity & Type Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label
-                  htmlFor="commodity"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
+                <label htmlFor="commodity" className="block text-sm font-medium text-foreground mb-2">
                   Commodity
                 </label>
                 <select
@@ -169,13 +207,21 @@ export default function NewCallPage() {
                     </option>
                   ))}
                 </select>
+                {formData.commodity === 'Custom' && (
+                  <div className="mt-2">
+                    <Input
+                      name="customCommodity"
+                      value={formData.customCommodity}
+                      onChange={handleChange}
+                      placeholder="Enter commodity name"
+                      required
+                    />
+                  </div>
+                )}
               </div>
 
               <div>
-                <label
-                  htmlFor="type"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
+                <label htmlFor="type" className="block text-sm font-medium text-foreground mb-2">
                   Call Type
                 </label>
                 <select
@@ -196,55 +242,26 @@ export default function NewCallPage() {
             </div>
 
             {/* Price Fields */}
-            <div>
-              <label
-                htmlFor="entryPrice"
-                className="block text-sm font-medium text-foreground mb-2"
-              >
-                Entry Price (₹)
-              </label>
-              <Input
-                type="number"
-                id="entryPrice"
-                name="entryPrice"
-                value={formData.entryPrice || ''}
-                onChange={handleChange}
-                placeholder="Enter entry price"
-                step="0.01"
-                min="0"
-                required
-              />
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-border pt-4">
               <div>
-                <label
-                  htmlFor="target"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
-                  Target Price (₹)
+                <label htmlFor="entryPrice" className="block text-sm font-medium text-foreground mb-2">
+                  Entry Price (₹)
                 </label>
                 <Input
                   type="number"
-                  id="target"
-                  name="target"
-                  value={formData.target || ''}
+                  id="entryPrice"
+                  name="entryPrice"
+                  value={formData.entryPrice || ''}
                   onChange={handleChange}
-                  placeholder="Enter target"
+                  placeholder="Enter entry price"
                   step="0.01"
                   min="0"
                   required
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formData.type === 'buy' ? 'Should be higher than entry' : 'Should be lower than entry'}
-                </p>
               </div>
 
               <div>
-                <label
-                  htmlFor="stopLoss"
-                  className="block text-sm font-medium text-foreground mb-2"
-                >
+                <label htmlFor="stopLoss" className="block text-sm font-medium text-foreground mb-2">
                   Stop Loss (₹)
                 </label>
                 <Input
@@ -258,10 +275,78 @@ export default function NewCallPage() {
                   min="0"
                   required
                 />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {formData.type === 'buy' ? 'Should be lower than entry' : 'Should be higher than entry'}
-                </p>
               </div>
+            </div>
+
+            {/* Multiple Targets Section */}
+            <div className="space-y-4 border-t border-border pt-4">
+               <div className="flex items-center justify-between">
+                <label className="text-sm font-medium text-foreground">Target Prices (Max 6)</label>
+                <Button 
+                  type="button" 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={addTarget}
+                  disabled={formData.targetPrices.length >= 6}
+                >
+                  + Add Target
+                </Button>
+              </div>
+              
+              <div className="space-y-3">
+                {formData.targetPrices.map((target, index) => (
+                  <div key={index} className="flex gap-2 items-start animate-fade-in">
+                    <div className="flex-1 grid grid-cols-2 gap-2">
+                      <Input
+                        value={target.label}
+                        onChange={(e) => handleTargetChange(index, 'label', e.target.value)}
+                        placeholder="Label (e.g. Target 1)"
+                        required
+                      />
+                      <Input
+                        type="number"
+                        value={target.price || ''}
+                        onChange={(e) => handleTargetChange(index, 'price', e.target.value)}
+                        placeholder="Price"
+                        step="0.01"
+                        required
+                      />
+                    </div>
+                    {formData.targetPrices.length > 1 && (
+                      <Button 
+                        type="button" 
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-destructive mt-1"
+                        onClick={() => removeTarget(index)}
+                      >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Analysis Field */}
+            <div className="border-t border-border pt-4">
+              <label htmlFor="analysis" className="block text-sm font-medium text-foreground mb-2">
+                Analysis / Rationale
+              </label>
+              <textarea
+                id="analysis"
+                name="analysis"
+                value={formData.analysis}
+                onChange={handleChange}
+                className="w-full px-4 py-2 border border-input rounded-3xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary h-32 resize-none"
+                placeholder="Enter technical or fundamental analysis for this call..."
+                required
+              />
+              <p className="text-xs text-muted-foreground mt-1 text-right">
+                {formData.analysis.length}/2000 characters
+              </p>
             </div>
 
             {/* Submit Buttons */}

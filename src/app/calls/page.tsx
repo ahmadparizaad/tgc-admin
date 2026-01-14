@@ -12,10 +12,13 @@ import type { Pagination, ClientResponse, PaginatedResponse } from '@/shared/typ
 
 const COMMODITY_OPTIONS = [
   { value: '', label: 'All Commodities' },
-  { value: 'gold', label: 'Gold' },
-  { value: 'silver', label: 'Silver' },
-  { value: 'nifty', label: 'Nifty' },
-  { value: 'copper', label: 'Copper' },
+  { value: 'Gold', label: 'Gold' },
+  { value: 'Silver', label: 'Silver' },
+  { value: 'Copper', label: 'Copper' },
+  { value: 'Crude', label: 'Crude' },
+  { value: 'CMX Gold', label: 'CMX Gold' },
+  { value: 'CMX Silver', label: 'CMX Silver' },
+  { value: 'Custom', label: 'Other/Manual' },
 ];
 
 const STATUS_OPTIONS = [
@@ -47,13 +50,15 @@ const getStatusBadgeVariant = (status: string): 'success' | 'danger' | 'warning'
 
 const getCommodityColor = (commodity: string): string => {
   switch (commodity) {
-    case 'gold':
+    case 'Gold':
+    case 'CMX Gold':
       return 'text-yellow-600 dark:text-yellow-400';
-    case 'silver':
+    case 'Silver':
+    case 'CMX Silver':
       return 'text-gray-500 dark:text-gray-400';
-    case 'nifty':
-      return 'text-blue-600 dark:text-blue-400';
-    case 'copper':
+    case 'Crude':
+      return 'text-slate-800 dark:text-slate-200';
+    case 'Copper':
       return 'text-orange-600 dark:text-orange-400';
     default:
       return 'text-gray-600 dark:text-gray-400';
@@ -74,6 +79,8 @@ function CallsContent() {
   const [commodity, setCommodity] = useState('');
   const [status, setStatus] = useState('');
   const [type, setType] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
 
   // Initial data fetch using useEffect
   useEffect(() => {
@@ -97,6 +104,8 @@ function CallsContent() {
       commodity: commodity || undefined,
       status: status || undefined,
       type: type || undefined,
+      startDate: startDate || undefined,
+      endDate: endDate || undefined,
       sortBy: 'date',
       sortOrder: 'desc',
     });
@@ -217,6 +226,26 @@ function CallsContent() {
             ))}
           </select>
 
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">From:</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="px-3 py-2 border border-input rounded-3xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">To:</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="px-3 py-2 border border-input rounded-3xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
           <Button onClick={handleFilter} isLoading={isLoading}>
             Apply Filters
           </Button>
@@ -280,7 +309,7 @@ function CallsContent() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className={`text-sm font-semibold uppercase ${getCommodityColor(call.commodity)}`}>
-                          {call.commodity}
+                          {call.commodity === 'Custom' ? call.customCommodity : call.commodity}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
@@ -291,8 +320,19 @@ function CallsContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {formatPrice(call.entryPrice)}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-success">
-                        {formatPrice(call.target)}
+                      <td className="px-6 py-4 text-sm text-success max-w-xs">
+                        {call.targetPrices && call.targetPrices.length > 0 ? (
+                          <div className="flex flex-col gap-0.5">
+                            {call.targetPrices.map((t, i) => (
+                              <div key={i} className="flex justify-between gap-2 border-b border-border/30 last:border-0 py-0.5">
+                                <span className="text-[10px] uppercase opacity-70">{t.label}:</span>
+                                <span>{formatPrice(t.price)}</span>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          formatPrice(call.target || 0)
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-destructive">
                         {formatPrice(call.stopLoss)}

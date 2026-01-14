@@ -11,6 +11,7 @@ function PaymentsContent() {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [fromDate, setFromDate] = useState('');
@@ -29,6 +30,27 @@ function PaymentsContent() {
     };
     fetchInitial();
   }, []);
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    try {
+      const { API_BASE_URL } = await import('@/shared/constants');
+      const { getAccessToken } = await import('@/services/api-client');
+      
+      const params = new URLSearchParams();
+      if (fromDate) params.append('fromDate', fromDate);
+      if (toDate) params.append('toDate', toDate);
+      
+      const token = getAccessToken();
+      const url = `${API_BASE_URL}/admin/payments/export?${params.toString()}&token=${token}`;
+      
+      window.open(url, '_blank');
+    } catch (err) {
+      console.error('Export failed', err);
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const fetchPayments = async (page = 1) => {
     setIsLoading(true);
@@ -61,9 +83,21 @@ function PaymentsContent() {
 
   return (
     <div className="space-y-6">
-      <div className="animate-slide-up">
-        <h1 className="text-2xl font-bold text-foreground">Payments</h1>
-        <p className="text-muted-foreground mt-1">View and filter all payment transactions</p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-slide-up">
+        <div>
+          <h1 className="text-2xl font-bold text-foreground">Payments</h1>
+          <p className="text-muted-foreground mt-1">View and filter all payment transactions</p>
+        </div>
+        <Button 
+          variant="secondary" 
+          onClick={handleExport}
+          isLoading={isExporting}
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+          </svg>
+          Export CSV
+        </Button>
       </div>
 
       <form onSubmit={handleSearch} className="flex flex-col sm:flex-row sm:items-center gap-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>

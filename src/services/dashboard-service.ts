@@ -57,10 +57,18 @@ export const getSubscriptionMetrics = async (): Promise<ClientResponse<Subscript
   return apiClient<SubscriptionMetrics>('/admin/dashboard/subscription-metrics');
 };
 
+/**
+ * Get revenue trend data
+ */
+export const getRevenueTrend = async (): Promise<ClientResponse<{ trend: { name: string; revenue: number }[] }>> => {
+  return apiClient<{ trend: { name: string; revenue: number }[] }>('/admin/dashboard/revenue-trend');
+};
+
 const dashboardService = {
   getDashboardStats,
   getRecentPayments,
   getSubscriptionMetrics,
+  getRevenueTrend,
 };
 
 export default dashboardService;
