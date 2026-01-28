@@ -32,6 +32,7 @@ export interface Admin {
 // User interface
 export interface User {
   id: string;
+  displayId?: string;
   firebaseUid: string | null;
   fullName: string | null;
   mobile: string;

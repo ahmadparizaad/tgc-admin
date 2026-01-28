@@ -8,13 +8,13 @@ export interface TargetPrice {
 }
 
 export interface Call {
-  [x: string]: number;
   id: string;
   _id?: string;
   commodity: 'Gold' | 'Silver' | 'Copper' | 'Crude' | 'CMX Gold' | 'CMX Silver' | 'Custom';
   customCommodity?: string;
   type: 'buy' | 'sell';
   entryPrice: number;
+  target?: number;
   targetPrices: TargetPrice[];
   stopLoss: number;
   analysis: string;
