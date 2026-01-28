@@ -162,7 +162,7 @@ export default function PlansPage() {
             {plans.map((plan) => (
               <div key={plan._id} className="bg-card rounded-4xl p-6 border border-border shadow-sm flex flex-col gap-4">
                 <div className="flex justify-between items-start">
-                  <div className="flex flex-col gap-1">
+                  <div className="flex flex-col gap-4">
                     <h3 className="font-bold text-lg">{plan.name}</h3>
                     <div className="flex gap-2">
                       <Badge variant={

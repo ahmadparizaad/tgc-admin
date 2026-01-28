@@ -146,8 +146,11 @@ function PaymentsContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {payments.map((p) => (
-                  <tr key={p._id} className="hover:bg-muted/50 transition-colors">
+                {payments.map((p, index) => (
+                  <tr 
+                    key={p._id} 
+                    className={`transition-colors hover:bg-primary/5 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/10'}`}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{p.user?.mobile || 'Unknown'}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-muted-foreground">{p.plan}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">{p.amount}</td>

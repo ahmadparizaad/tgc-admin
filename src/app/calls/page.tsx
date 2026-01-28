@@ -5,8 +5,7 @@ import Link from 'next/link';
 import { DashboardLayout } from '@/components/templates';
 import { Button, Badge } from '@/components/atoms';
 import { getCalls, deleteCall } from '@/services/call-service';
-import ConfirmDialog from '@/components/molecules/confirm-dialog';
-import { useToast } from '@/components/molecules';
+import { ConfirmDialog, TargetsModal, useToast } from '@/components/molecules';
 import type { Call } from '@/services/call-service';
 import type { Pagination, ClientResponse, PaginatedResponse } from '@/shared/types';
 
@@ -73,6 +72,8 @@ function CallsContent() {
   const [currentPage, setCurrentPage] = useState(1);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [selectedCall, setSelectedCall] = useState<Call | null>(null);
+  const [targetsModalOpen, setTargetsModalOpen] = useState(false);
+  const [selectedCallForTargets, setSelectedCallForTargets] = useState<Call | null>(null);
   const { showToast } = useToast();
 
   // Filters
@@ -149,6 +150,11 @@ function CallsContent() {
     setIsDeleting(null);
     setConfirmOpen(false);
     setSelectedCall(null);
+  };
+
+  const handleViewTargets = (call: Call) => {
+    setSelectedCallForTargets(call);
+    setTargetsModalOpen(true);
   };
 
   const formatPrice = (price: number): string => {
@@ -300,10 +306,13 @@ function CallsContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {calls.map((call) => {
+                {calls.map((call, index) => {
                   const callId = call.id || call._id;
                   return (
-                    <tr key={callId} className="hover:bg-muted/50 transition-colors">
+                    <tr 
+                      key={callId} 
+                      className={`transition-colors hover:bg-primary/5 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/10'}`}
+                    >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {formatDate(call.date)}
                       </td>
@@ -320,19 +329,15 @@ function CallsContent() {
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-foreground">
                         {formatPrice(call.entryPrice)}
                       </td>
-                      <td className="px-6 py-4 text-sm text-success max-w-xs">
-                        {call.targetPrices && call.targetPrices.length > 0 ? (
-                          <div className="flex flex-col gap-0.5">
-                            {call.targetPrices.map((t, i) => (
-                              <div key={i} className="flex justify-between gap-2 border-b border-border/30 last:border-0 py-0.5">
-                                <span className="text-[10px] uppercase opacity-70">{t.label}:</span>
-                                <span>{formatPrice(t.price)}</span>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          formatPrice(call.target || 0)
-                        )}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <Button 
+                          variant="secondary" 
+                          size="sm" 
+                          className="text-success hover:text-success/90 bg-success/5 border-success/20 font-medium rounded-xl px-4"
+                          onClick={() => handleViewTargets(call)}
+                        >
+                          View All
+                        </Button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-destructive">
                         {formatPrice(call.stopLoss)}
@@ -379,6 +384,15 @@ function CallsContent() {
           }}
           onConfirmAction={handleDeleteConfirm}
           isLoading={!!isDeleting}
+        />
+
+        <TargetsModal
+          open={targetsModalOpen}
+          call={selectedCallForTargets}
+          onClose={() => {
+            setTargetsModalOpen(false);
+            setSelectedCallForTargets(null);
+          }}
         />
 
         {/* Pagination */}

@@ -176,8 +176,11 @@ function UsersContent() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-border">
-                {users.map((user) => (
-                  <tr key={user.id} className="hover:bg-muted/50 transition-colors">
+                {users.map((user, index) => (
+                  <tr 
+                    key={user.id} 
+                    className={`transition-colors hover:bg-primary/5 ${index % 2 === 0 ? 'bg-transparent' : 'bg-muted/10'}`}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex flex-col">
                         <span className="text-xs font-mono text-primary bg-primary/10 px-1.5 py-0.5 rounded-md w-fit mb-1">
@@ -203,7 +206,7 @@ function UsersContent() {
                       <div className="flex flex-col gap-1">
                         {user.hasActiveSubscription ? (
                           <>
-                            <Badge variant="info" className="w-fit">
+                            <Badge variant="info" className="w-fit mb-1">
                               {user.subscription.planTier}
                             </Badge>
                             {user.subscription.endDate && (

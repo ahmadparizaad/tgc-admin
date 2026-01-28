@@ -148,8 +148,8 @@ h6 {
 .bg-popover {
   backdrop-filter: blur(20px) saturate(180%);
   -webkit-backdrop-filter: blur(20px) saturate(180%);
-  background-color: rgba(24, 24, 27, 0.733);
-  border: 1px solid rgba(255, 255, 255, 0.457);
+  background-color: rgba(32, 32, 35, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 /* Input styling for better cross-browser compatibility */

@@ -223,7 +223,7 @@ function UserDetailsContent({ userId }: { userId: string }) {
                   </svg>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <h2 className="text-lg sm:text-xl font-semibold text-foreground truncate">
+                  <h2 className="text-lg sm:text-xl font-semibold text-foreground truncate mb-2">
                     {user?.fullName || user?.mobile}
                   </h2>
                   <Badge variant={user?.isActive ? 'success' : 'danger'}>
