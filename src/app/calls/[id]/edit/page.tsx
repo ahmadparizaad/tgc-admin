@@ -48,6 +48,7 @@ export default function EditCallPage() {
     analysis: '',
     date: new Date().toISOString().split('T')[0],
     status: 'active',
+    tradeType: 'intraday',
   });
 
   // Fetch call data
@@ -69,6 +70,7 @@ export default function EditCallPage() {
           analysis: fetchedCall.analysis || '',
           date: fetchedCall.date.split('T')[0],
           status: fetchedCall.status,
+          tradeType: fetchedCall.tradeType || 'intraday',
         });
       } else {
         setError(response.error || 'Failed to fetch call');
@@ -291,6 +293,57 @@ export default function EditCallPage() {
                 className="w-full px-4 py-2 border border-input rounded-3xl bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                 required
               />
+            </div>
+
+            {/* Trade Type Toggle */}
+            <div>
+              <label className="block text-sm font-medium text-foreground mb-3">
+                Trade Type
+              </label>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, tradeType: 'intraday' })}
+                  className={`flex-1 px-4 py-3 rounded-3xl font-medium transition-all border-2 ${
+                    formData.tradeType === 'intraday'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]'
+                      : 'bg-background text-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {formData.tradeType === 'intraday' && (
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                    <span>Intraday</span>
+                  </div>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, tradeType: 'short_term' })}
+                  className={`flex-1 px-4 py-3 rounded-3xl font-medium transition-all border-2 ${
+                    formData.tradeType === 'short_term'
+                      ? 'bg-primary text-primary-foreground border-primary shadow-md scale-[1.02]'
+                      : 'bg-background text-foreground border-border hover:border-primary/50'
+                  }`}
+                >
+                  <div className="flex items-center justify-center gap-2">
+                    {formData.tradeType === 'short_term' && (
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    )}
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>Short Term</span>
+                  </div>
+                </button>
+              </div>
             </div>
 
             {/* Commodity & Type Row */}

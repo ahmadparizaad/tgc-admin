@@ -18,6 +18,7 @@ export interface Call {
   targetPrices: TargetPrice[];
   stopLoss: number;
   analysis: string;
+  tradeType: 'intraday' | 'short_term';
   status: 'active' | 'hit_target' | 'hit_stoploss' | 'expired';
   date: string;
   createdBy?: {
@@ -38,6 +39,7 @@ export interface CreateCallData {
   analysis: string;
   date: string;
   status?: string;
+  tradeType?: 'intraday' | 'short_term';
 }
 
 export interface GetCallsParams {
@@ -46,6 +48,7 @@ export interface GetCallsParams {
   commodity?: string;
   status?: string;
   type?: string;
+  tradeType?: 'intraday' | 'short_term';
   startDate?: string;
   endDate?: string;
   sortBy?: string;
@@ -65,6 +68,7 @@ export const getCalls = async (
   if (params.commodity) searchParams.set('commodity', params.commodity);
   if (params.status) searchParams.set('status', params.status);
   if (params.type) searchParams.set('type', params.type);
+  if (params.tradeType) searchParams.set('tradeType', params.tradeType);
   if (params.startDate) searchParams.set('startDate', params.startDate);
   if (params.endDate) searchParams.set('endDate', params.endDate);
   if (params.sortBy) searchParams.set('sortBy', params.sortBy);
