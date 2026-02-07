@@ -247,7 +247,12 @@ function EditUserForm({ userId }: { userId: string }) {
                   {user.hasActiveSubscription ? 'Active' : 'Inactive'}
                 </span>
               </div>
-              {!user.subscription.isUnlimited && user.subscription.endDate && (
+              {user.subscription.isUnlimited || !user.subscription.endDate ? (
+                <div className="col-span-2">
+                  <span className="text-muted-foreground">Expires:</span>{' '}
+                  <span className="font-medium text-green-600">Unlimited Access</span>
+                </div>
+              ) : (
                 <div className="col-span-2">
                   <span className="text-muted-foreground">Expires:</span>{' '}
                   <span className="font-medium">{formatDate(user.subscription.endDate)}</span>

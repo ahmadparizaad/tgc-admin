@@ -209,7 +209,11 @@ function UsersContent() {
                             <Badge variant="info" className="w-fit mb-1">
                               {user.subscription.planTier}
                             </Badge>
-                            {user.subscription.endDate && (
+                            {user.subscription.isUnlimited || !user.subscription.endDate ? (
+                              <span className="text-[10px] font-bold text-green-600 dark:text-green-400">
+                                Unlimited Access
+                              </span>
+                            ) : (
                               <span className="text-[10px] text-muted-foreground">
                                 Expires: {new Date(user.subscription.endDate).toLocaleDateString()}
                               </span>

@@ -140,9 +140,8 @@ function UserDetailsContent({ userId }: { userId: string }) {
 
   const isSubscriptionActive = (user: User): boolean => {
     if (!user.subscription?.isActive) return false;
-    // Unlimited subscriptions are always active
-    if (user.subscription?.isUnlimited) return true;
-    if (!user.subscription?.endDate) return false;
+    // Unlimited subscriptions or subscriptions with no end date are always active
+    if (user.subscription?.isUnlimited || !user.subscription?.endDate) return true;
     return new Date(user.subscription.endDate) > new Date();
   };
 
@@ -303,7 +302,14 @@ function UserDetailsContent({ userId }: { userId: string }) {
                       {formatDate(user.subscription.startDate)}
                     </span>
                   </div>
-                  {!user.subscription.isUnlimited && (
+                  {user.subscription.isUnlimited || !user.subscription.endDate ? (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">End Date</span>
+                      <span className="text-foreground font-bold text-green-600">
+                        Unlimited Access
+                      </span>
+                    </div>
+                  ) : (
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">End Date</span>
                       <span className="text-foreground">
